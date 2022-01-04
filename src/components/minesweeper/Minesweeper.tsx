@@ -15,19 +15,46 @@ type square = {
 const Minesweeper: FC<Props> = ({
    height = 5,
    width = 5,
-   mines = Math.floor(height * width * 0.25),
+   mines,
    tileSize = 20,
 }) => {
    const [grid, setGrid] = useState<Array<Array<square>>>([]);
    // const [timer, setTimer] = useState(0);
-   const [gameOver, setGameOver] = useState(false);
-   const [remainingMines, setRemainingMines] = useState(mines);
+   const [gameOver, setGameOver] = useState<{
+      gameOver: boolean;
+      playerWon: boolean;
+   }>({ gameOver: false, playerWon: false });
+   const [remainingMines, setRemainingMines] = useState(
+      mines ?? Math.floor(height * width * 0.25)
+   );
    const [hasClicked, setHasClicked] = useState<{
       clicked: boolean;
       x: number;
       y: number;
    }>({ clicked: false, x: 0, y: 0 });
-
+   const minesInTotal = Math.floor(height * width * 0.25);
+   useEffect(() => {
+      renderGridInitial();
+   }, []);
+   useEffect(() => {
+      if (hasClicked.clicked) {
+         clickSquare(hasClicked.x, hasClicked.y);
+      }
+   }, [hasClicked.clicked]);
+   useEffect(() => {
+      if (remainingMines === 0) {
+         setGameOver({ gameOver: true, playerWon: true });
+      }
+   }, [remainingMines]);
+   useEffect(() => {
+      if (gameOver.playerWon) {
+         //player won the game
+         console.log('won');
+      } else {
+         //player lost the game
+         console.log('lost');
+      }
+   }, [gameOver.gameOver]);
    const randomInt = (max: number = 0) => {
       return Math.floor(Math.random() * (max + 1));
    };
@@ -73,6 +100,7 @@ const Minesweeper: FC<Props> = ({
          }
       }
    };
+
    const getProximityTiles = (
       originX: number,
       originY: number,
@@ -101,7 +129,7 @@ const Minesweeper: FC<Props> = ({
    const renderGridInitial = () => {
       let totalSquares = height * width;
       let starterGrid: square[][] = [];
-      if (mines > totalSquares) mines = totalSquares;
+      if (minesInTotal > totalSquares) mines = totalSquares;
       for (let row = 0; row < height; row++) {
          starterGrid[row] = Array<square>();
          for (let column = 0; column < width; column++) {
@@ -130,7 +158,7 @@ const Minesweeper: FC<Props> = ({
          // get all tile numbers adjacent to clicked
          dontPlaceNumbers.push(coord.y * width + coord.x);
       });
-      for (let it = 0; it < mines; it++) {
+      for (let it = 0; it < minesInTotal; it++) {
          // get all tile numbers to place mines in
          let currentMine = randomInt(availableSquares.length - 1);
          if (dontPlaceNumbers.includes(currentMine)) {
@@ -158,11 +186,7 @@ const Minesweeper: FC<Props> = ({
       }
       setHasClicked({ clicked: true, x: xClicked, y: yClicked });
    };
-   useEffect(() => {
-      if (hasClicked.clicked) {
-         clickSquare(hasClicked.x, hasClicked.y);
-      }
-   }, [hasClicked.clicked]);
+
    const clickSquare = (x: number, y: number) => {
       if (grid[y][x].clicked || gameOver) return;
       if (!hasClicked.clicked) {
@@ -171,7 +195,7 @@ const Minesweeper: FC<Props> = ({
          const copy = [...grid];
          if (copy[y][x].isMine) {
             grid[y][x].clicked = true;
-            setGameOver(true);
+            setGameOver({ gameOver: true, playerWon: false });
             return;
          } else {
             copy[y][x].clicked = true;
@@ -211,9 +235,6 @@ const Minesweeper: FC<Props> = ({
       copy[y][x].flagged = !copy[y][x].flagged;
       setGrid(copy);
    };
-   useEffect(() => {
-      renderGridInitial();
-   }, []);
    const TileComponent: FC<{ x: number; y: number; tileInfo: square }> = ({
       x,
       y,
@@ -272,7 +293,6 @@ const Minesweeper: FC<Props> = ({
          tileInfo.clicked,
          tileInfo.flagged,
          tileInfo.isMine,
-         tileInfo,
       ]);
    return (
       <div id="minesweeper">
@@ -285,7 +305,6 @@ const Minesweeper: FC<Props> = ({
          >
             {grid?.map((row, rowIndex) => {
                return row.map((square, columnIndex) => {
-                  // console.log(rowIndex*width+columnIndex);
                   return (
                      <TileComponent
                         key={rowIndex * columnIndex + columnIndex}
