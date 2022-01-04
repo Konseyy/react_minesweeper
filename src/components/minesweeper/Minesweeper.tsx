@@ -47,6 +47,7 @@ const Minesweeper: FC<Props> = ({
       }
    }, [remainingMines]);
    useEffect(() => {
+      if (!gameOver.gameOver) return;
       if (gameOver.playerWon) {
          //player won the game
          console.log('won');
@@ -59,7 +60,7 @@ const Minesweeper: FC<Props> = ({
       return Math.floor(Math.random() * (max + 1));
    };
    const getImage = (tile: square) => {
-      if (tile.isMine && gameOver) {
+      if (tile.isMine && gameOver.gameOver) {
          return require('./img/bomb.png');
       }
       if (tile.clicked) {
@@ -188,7 +189,7 @@ const Minesweeper: FC<Props> = ({
    };
 
    const clickSquare = (x: number, y: number) => {
-      if (grid[y][x].clicked || gameOver) return;
+      if (grid[y][x].clicked || gameOver.gameOver) return;
       if (!hasClicked.clicked) {
          renderMinesInitial(x, y);
       } else {
