@@ -12,21 +12,15 @@ type square = {
    flagged: boolean;
 };
 
-const Minesweeper: FC<Props> = ({
-   height = 5,
-   width = 5,
-   mines,
-   tileSize = 20,
-}) => {
+const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 }) => {
+   const SPACE_AROUND_FIRST_CLICK = 3;
    const [grid, setGrid] = useState<Array<Array<square>>>([]);
    // const [timer, setTimer] = useState(0);
    const [gameOver, setGameOver] = useState<{
       gameOver: boolean;
       playerWon: boolean;
    }>({ gameOver: false, playerWon: false });
-   const [remainingMines, setRemainingMines] = useState(
-      mines ?? Math.floor(height * width * 0.25)
-   );
+   const [remainingMines, setRemainingMines] = useState(mines ?? Math.floor(height * width * 0.25));
    const [hasClicked, setHasClicked] = useState<{
       clicked: boolean;
       x: number;
@@ -102,12 +96,7 @@ const Minesweeper: FC<Props> = ({
       }
    };
 
-   const getProximityTiles = (
-      originX: number,
-      originY: number,
-      distance: number,
-      grid: square[][]
-   ) => {
+   const getProximityTiles = (originX: number, originY: number, distance: number, grid: square[][]) => {
       let returnCoordinates: { x: number; y: number }[] = [];
       let returnSquares: square[] = [];
       let gridCopy = [...grid];
@@ -153,7 +142,7 @@ const Minesweeper: FC<Props> = ({
          // get all tile numbers
          availableSquares.push(iter);
       }
-      const dontPlace = getProximityTiles(xClicked, yClicked, 2, copy);
+      const dontPlace = getProximityTiles(xClicked, yClicked, SPACE_AROUND_FIRST_CLICK, copy);
       let dontPlaceNumbers: number[] = [];
       dontPlace.coordinates.forEach((coord) => {
          // get all tile numbers adjacent to clicked
@@ -208,16 +197,10 @@ const Minesweeper: FC<Props> = ({
          if (copy[y][x].adjacent === 0) {
             const adjacent = getProximityTiles(x, y, 1, copy);
             adjacent.coordinates.forEach((sq, idx) => {
-               if (
-                  adjacent.squares[idx].adjacent === 0 &&
-                  !adjacent.squares[idx].isMine
-               ) {
+               if (adjacent.squares[idx].adjacent === 0 && !adjacent.squares[idx].isMine) {
                   clickSquare(sq.x, sq.y);
                }
-               if (
-                  !adjacent.squares[idx].isMine ||
-                  (sq.y === y && sq.x === x)
-               ) {
+               if (!adjacent.squares[idx].isMine || (sq.y === y && sq.x === x)) {
                   adjacent.squares[idx].clicked = true;
                }
             });
@@ -236,11 +219,7 @@ const Minesweeper: FC<Props> = ({
       copy[y][x].flagged = !copy[y][x].flagged;
       setGrid(copy);
    };
-   const TileComponent: FC<{ x: number; y: number; tileInfo: square }> = ({
-      x,
-      y,
-      tileInfo,
-   }) =>
+   const TileComponent: FC<{ x: number; y: number; tileInfo: square }> = ({ x, y, tileInfo }) =>
       useMemo(() => {
          return (
             <div
@@ -277,8 +256,7 @@ const Minesweeper: FC<Props> = ({
                         style={{
                            height: tileSize,
                            width: tileSize,
-                           opacity:
-                              tileInfo.isMine && tileInfo.clicked ? 0.5 : 1,
+                           opacity: tileInfo.isMine && tileInfo.clicked ? 0.5 : 1,
                         }}
                         src={getImage(tileInfo)}
                         alt="mine"
@@ -287,23 +265,13 @@ const Minesweeper: FC<Props> = ({
                </div>
             </div>
          );
-      }, [
-         x,
-         y,
-         tileInfo.adjacent,
-         tileInfo.clicked,
-         tileInfo.flagged,
-         tileInfo.isMine,
-      ]);
+      }, [x, y, tileInfo.adjacent, tileInfo.clicked, tileInfo.flagged, tileInfo.isMine]);
    return (
       <div id="minesweeper">
          <div id="minesweeper-header" style={{ width: tileSize * width }}>
             Hello {remainingMines}
          </div>
-         <div
-            id="minesweeper-board"
-            style={{ width: tileSize * width, height: tileSize * height }}
-         >
+         <div id="minesweeper-board" style={{ width: tileSize * width, height: tileSize * height }}>
             {grid?.map((row, rowIndex) => {
                return row.map((square, columnIndex) => {
                   return (
