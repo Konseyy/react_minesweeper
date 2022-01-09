@@ -27,32 +27,11 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
       y: number;
    }>({ clicked: false, x: 0, y: 0 });
    const minesInTotal = Math.floor(height * width * 0.25);
-   useEffect(() => {
-      renderGridInitial();
-   }, []);
-   useEffect(() => {
-      if (hasClicked.clicked) {
-         clickSquare(hasClicked.x, hasClicked.y);
-      }
-   }, [hasClicked.clicked]);
-   useEffect(() => {
-      if (remainingMines === 0) {
-         setGameOver({ gameOver: true, playerWon: true });
-      }
-   }, [remainingMines]);
-   useEffect(() => {
-      if (!gameOver.gameOver) return;
-      if (gameOver.playerWon) {
-         //player won the game
-         console.log('won');
-      } else {
-         //player lost the game
-         console.log('lost');
-      }
-   }, [gameOver.gameOver]);
+   // returns random number in interval [0, max]
    const randomInt = (max: number = 0) => {
       return Math.floor(Math.random() * (max + 1));
    };
+   // function that returns tile image based on tile info
    const getImage = (tile: square) => {
       if (tile.isMine && gameOver.gameOver) {
          return require('./img/bomb.png');
@@ -95,7 +74,7 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
          }
       }
    };
-
+   // function that returns all tiles and all tile coordinates within a specific distance from a given tile
    const getProximityTiles = (originX: number, originY: number, distance: number, grid: square[][]) => {
       let returnCoordinates: { x: number; y: number }[] = [];
       let returnSquares: square[] = [];
@@ -116,6 +95,7 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
       });
       return { coordinates: returnCoordinates, squares: returnSquares };
    };
+   // render the starting grid
    const renderGridInitial = () => {
       let totalSquares = height * width;
       let starterGrid: square[][] = [];
@@ -133,6 +113,7 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
       }
       setGrid(starterGrid);
    };
+   // place mines after first click
    const renderMinesInitial = (xClicked: number, yClicked: number) => {
       const copy = [...grid];
       let totalSquares = height * width;
@@ -176,7 +157,35 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
       }
       setHasClicked({ clicked: true, x: xClicked, y: yClicked });
    };
-
+   // render the grid on component mount
+   useEffect(() => {
+      renderGridInitial();
+   }, []);
+   // execute click on the square after rendering mines after first click
+   useEffect(() => {
+      if (hasClicked.clicked) {
+         clickSquare(hasClicked.x, hasClicked.y);
+      }
+   }, [hasClicked.clicked]);
+   // if player finds all mines player won
+   useEffect(() => {
+      if (remainingMines === 0) {
+         //TODO check if any mines are still hidden
+         setGameOver({ gameOver: true, playerWon: true });
+      }
+   }, [remainingMines]);
+   // announce player winning or losing
+   useEffect(() => {
+      if (!gameOver.gameOver) return;
+      if (gameOver.playerWon) {
+         //player won the game
+         console.log('won');
+      } else {
+         //player lost the game
+         console.log('lost');
+      }
+   }, [gameOver]);
+   // tile gets left clicked
    const clickSquare = (x: number, y: number) => {
       if (grid[y][x].clicked || gameOver.gameOver) return;
       if (!hasClicked.clicked) {
@@ -208,8 +217,9 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
          setGrid(copy);
       }
    };
+   // tile gets right clicked
    const flagSquare = (x: number, y: number) => {
-      if (grid[y][x].clicked) return;
+      if (grid[y][x].clicked || gameOver.gameOver) return;
       const copy = [...grid];
       if (copy[y][x].flagged) {
          setRemainingMines((i) => i + 1);
@@ -218,6 +228,14 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
       }
       copy[y][x].flagged = !copy[y][x].flagged;
       setGrid(copy);
+   };
+   //Reset game to start state when reset button pressed
+   const resetGame = () => {
+      setGameOver({ gameOver: false, playerWon: false });
+      setRemainingMines(mines ?? Math.floor(height * width * 0.25));
+      setGrid([]);
+      renderGridInitial();
+      setHasClicked({ clicked: false, x: 0, y: 0 });
    };
    const TileComponent: FC<{ x: number; y: number; tileInfo: square }> = ({ x, y, tileInfo }) =>
       useMemo(() => {
@@ -265,23 +283,19 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
                </div>
             </div>
          );
-      }, [x, y, tileInfo.adjacent, tileInfo.clicked, tileInfo.flagged, tileInfo.isMine]);
+      }, [x, y, tileInfo]);
    return (
-      <div id="minesweeper">
-         <div id="minesweeper-header" style={{ width: tileSize * width }}>
-            Hello {remainingMines}
+      <div id="minesweeper" style={{ width: tileSize * width }}>
+         <div id="minesweeper-header" style={{ width: tileSize * width, display: 'flex', flexDirection: 'row' }}>
+            <div>Remaining: {remainingMines}</div>
+            <div style={{ marginLeft: 'auto' }}>
+               <button onClick={resetGame}>Reset</button>
+            </div>
          </div>
          <div id="minesweeper-board" style={{ width: tileSize * width, height: tileSize * height }}>
             {grid?.map((row, rowIndex) => {
                return row.map((square, columnIndex) => {
-                  return (
-                     <TileComponent
-                        key={rowIndex * columnIndex + columnIndex}
-                        x={columnIndex}
-                        y={rowIndex}
-                        tileInfo={square}
-                     />
-                  );
+                  return <TileComponent key={rowIndex * columnIndex + columnIndex} x={columnIndex} y={rowIndex} tileInfo={square} />;
                });
             })}
          </div>
