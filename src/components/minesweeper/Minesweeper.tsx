@@ -160,14 +160,14 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
    // render the grid on component mount
    useEffect(() => {
       renderGridInitial();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
    // execute click on the square after rendering mines after first click
    useEffect(() => {
       if (hasClicked.clicked) {
          clickSquare(hasClicked.x, hasClicked.y);
       }
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [hasClicked.clicked]);
    // if player finds all mines player won
    useEffect(() => {
@@ -181,10 +181,10 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
       if (!gameOver.gameOver) return;
       if (gameOver.playerWon) {
          //player won the game
-         console.log('won');
+         console.log('Player won');
       } else {
          //player lost the game
-         console.log('lost');
+         console.log('Player lost');
       }
    }, [gameOver]);
    // tile gets left clicked
@@ -287,14 +287,17 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
          );
       }, [x, y, tileInfo]);
    return (
-      <div id="minesweeper" style={{ width: tileSize * width}}>
+      <div id="minesweeper" style={{ width: tileSize * width }}>
          <div id="minesweeper-header" style={{ width: tileSize * width, display: 'flex', flexDirection: 'row' }}>
             <div>Remaining: {remainingMines}</div>
             <div style={{ marginLeft: 'auto' }}>
                <button onClick={resetGame}>Reset</button>
             </div>
          </div>
-         <div id="minesweeper-board" style={{ width: tileSize * width, height: tileSize * height,marginTop:10, border:"3px solid black" }}>
+         <div
+            id="minesweeper-board"
+            style={{ width: tileSize * width, height: tileSize * height, marginTop: 10, border: '3px solid black' }}
+         >
             {grid?.map((row, rowIndex) => {
                return row.map((square, columnIndex) => {
                   return <TileComponent key={rowIndex * columnIndex + columnIndex} x={columnIndex} y={rowIndex} tileInfo={square} />;

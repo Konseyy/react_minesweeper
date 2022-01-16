@@ -6,9 +6,7 @@ import useWindowWidth from './hooks/useScreenSize';
 
 function App() {
    const windowSize = useWindowWidth();
-   useEffect(() => {
-      console.log('wid', windowSize);
-   }, [windowSize]);
+   useEffect(() => {}, [windowSize]);
    return (
       <div className="App">
          <Minesweeper
