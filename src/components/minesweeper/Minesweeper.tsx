@@ -160,12 +160,14 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
    // render the grid on component mount
    useEffect(() => {
       renderGridInitial();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
    // execute click on the square after rendering mines after first click
    useEffect(() => {
       if (hasClicked.clicked) {
          clickSquare(hasClicked.x, hasClicked.y);
       }
+		// eslint-disable-next-line react-hooks/exhaustive-deps
    }, [hasClicked.clicked]);
    // if player finds all mines player won
    useEffect(() => {
