@@ -285,14 +285,14 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
          );
       }, [x, y, tileInfo]);
    return (
-      <div id="minesweeper" style={{ width: tileSize * width }}>
+      <div id="minesweeper" style={{ width: tileSize * width}}>
          <div id="minesweeper-header" style={{ width: tileSize * width, display: 'flex', flexDirection: 'row' }}>
             <div>Remaining: {remainingMines}</div>
             <div style={{ marginLeft: 'auto' }}>
                <button onClick={resetGame}>Reset</button>
             </div>
          </div>
-         <div id="minesweeper-board" style={{ width: tileSize * width, height: tileSize * height }}>
+         <div id="minesweeper-board" style={{ width: tileSize * width, height: tileSize * height,marginTop:10, border:"3px solid black" }}>
             {grid?.map((row, rowIndex) => {
                return row.map((square, columnIndex) => {
                   return <TileComponent key={rowIndex * columnIndex + columnIndex} x={columnIndex} y={rowIndex} tileInfo={square} />;

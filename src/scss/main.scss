@@ -4,37 +4,9 @@ body {
    height: 100%;
    font-family: 'Roboto Slab', serif;
 }
-a {
-   text-decoration: none;
-}
-.contentCard {
-   max-width: 800px;
-   max-height: 450px;
-   display: inline-block;
-   border-radius: 50px;
-   padding: 20px;
-   box-sizing: border-box;
-   h1 {
-      font-weight: bold;
-      font-size: 50px;
-      margin-bottom: 15px;
-   }
-   p {
-      margin-left: 5px;
-      font-size: 22px;
-      line-height: 25px;
-      align-self: flex-start;
-   }
-   .contentCardInfo {
-      align-items: center;
-   }
-   .contentCardImg {
-      margin-left: 20px;
-      height: 400px;
-      width: 400px;
-      border-radius: 50%;
-   }
-}
-.contentCard.mobile {
-   width: 90%;
+#root{
+	height:100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
