@@ -256,6 +256,7 @@ const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 })
                }}
                onContextMenu={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   flagSquare(x, y);
                }}
             >
