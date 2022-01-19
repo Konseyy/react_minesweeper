@@ -13,6 +13,18 @@ type square = {
 };
 
 const Minesweeper: FC<Props> = ({ height = 5, width = 5, mines, tileSize = 20 }) => {
+   useEffect(() => {
+      let l1;
+      l1 = document.addEventListener(
+         'contextmenu',
+         (e) => {
+            console.log('blocking context menu');
+            e.preventDefault();
+         },
+         false
+      );
+      return l1;
+   });
    const SPACE_AROUND_FIRST_CLICK = 3;
    const [grid, setGrid] = useState<Array<Array<square>>>([]);
    // const [timer, setTimer] = useState(0);
